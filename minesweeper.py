@@ -49,8 +49,8 @@ class Minesweeper:
             "flags": Label(self.frame, text = "Flags: 0")
         }
         self.labels["time"].grid(row = 0, column = 0, columnspan = SIZE_Y) # top full width
-        self.labels["mines"].grid(row = SIZE_X+1, column = 0, columnspan = SIZE_Y/2) # bottom left
-        self.labels["flags"].grid(row = SIZE_X+1, column = SIZE_Y/2-1, columnspan = SIZE_Y/2) # bottom right
+        self.labels["mines"].grid(row = int(SIZE_X+1), column = 0, columnspan = int(SIZE_Y/2)) # bottom left
+        self.labels["flags"].grid(row = int(SIZE_X+1), column = int(SIZE_Y/2-1), columnspan = int(SIZE_Y/2)) # bottom right
 
         self.restart() # start game
         self.updateTimer() # init timer
@@ -110,6 +110,7 @@ class Minesweeper:
     def restart(self):
         self.setup()
         self.refreshLabels()
+        self.solver()
 
     def refreshLabels(self):
         self.labels["flags"].config(text = "Flags: "+str(self.flagCount))
@@ -239,7 +240,29 @@ class Minesweeper:
         tile["state"] = STATE_CLICKED
         self.clickedCount += 1
 
+    def step(self, x, y):
+        self.onClickWrapper(x, y)
+        self.onClick(self.tiles[x][y])
+
+    def flag(self, x, y):
+        self.onRightClickWrapper(x, y)
+        self.onRightClick(self.tiles[x][y])
+
+    def findNextNumber(self):
+        for x in range(0, SIZE_X):
+            for y in range(0, SIZE_Y):
+                print(self.tiles[x][y])
+                if self.tiles[x][y]["mines"] != 0 and self.tiles[x][y]["state"] == STATE_CLICKED:
+                    return self.tiles[x][y]
+
+
+    def think(self, tile):
+        print(tile)
+
+    def solver(self):
+        self.think("NextNumber:" + str(self.findNextNumber())
 ### END OF CLASSES ###
+
 
 def main():
     # create Tk instance
@@ -248,8 +271,11 @@ def main():
     window.title("Minesweeper")
     # create game instance
     minesweeper = Minesweeper(window)
+
     # run event loop
     window.mainloop()
+
+
 
 if __name__ == "__main__":
     main()
